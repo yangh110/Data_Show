@@ -34,15 +34,14 @@ public class ServerThread implements Runnable{
     public ServerThread(Socket s1) throws IOException {
         
         this.s1 = s1;
+        //数据端连接成功后,准备发送到Android端
         ds = new DatagramSocket(PORT);
-        
-        
+        //连接成功,打印
         System.out.println("conn success\n");
-        //br = new BufferedReader(new InputStreamReader(s.getInputStream(), "utf-8"));
+        //创建读端
         br1 = new BufferedReader(new InputStreamReader(s1.getInputStream(),"utf-8"));
 
-
-        //df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+       
     }
 
     public void run()
@@ -52,25 +51,23 @@ public class ServerThread implements Runnable{
             
             String content = null;
             
-            
-            
-
 	        while((content = readForm()) != null)
 	        {
-	        	
+	        	//接收到的包,用于更改ip地址
 	        	ds.receive(inPacket);
-	            //System.out.println(inBuff == inPacket.getData());
 	            
+	            //打印信息,用于检测接收信息是否又问题
 	            System.out.println("\n" + content);
-	                    
+	            //将数据端的信息转化为byte数组        
 	            byte[] sendData = (content + "\n").getBytes("utf-8");
-	                    
+	            //填充发送包的信息        
 	            outPacket = new DatagramPacket(sendData , sendData.length , inPacket.getSocketAddress());
-	
+	            //发射!!
 	            ds.send(outPacket);
+	            //执行成功
 	            System.out.println("send success\n");
+	            //将字符串置空
 	            content = null;
-	               
 	
 	         }     
             
@@ -79,9 +76,13 @@ public class ServerThread implements Runnable{
         } catch (IOException e) {
             e.printStackTrace();
         }
+        finally
+        {
+        	ds.close();
+        }
     }
 
-    //鐠囪褰囬弫鐗堝祦濞堬拷
+    //读方法,是否读成功,长连接
     private String readForm()
     {
         try {
