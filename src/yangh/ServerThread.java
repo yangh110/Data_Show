@@ -34,51 +34,68 @@ public class ServerThread implements Runnable{
     public ServerThread(Socket s1) throws IOException {
         
         this.s1 = s1;
-        //数据端连接成功后,准备发送到Android端
-        ds = new DatagramSocket(PORT);
-        //连接成功,打印
-        System.out.println("conn success\n");
-        //创建读端
-        br1 = new BufferedReader(new InputStreamReader(s1.getInputStream(),"utf-8"));
-
+       
        
     }
 
     public void run()
     {
-        try 
+    	while(true)
         {
+    		try 
+    		{
             
-            String content = null;
-            
-	        while((content = readForm()) != null)
-	        {
-	        	//接收到的包,用于更改ip地址
-	        	ds.receive(inPacket);
+	            String content = null;
 	            
-	            //打印信息,用于检测接收信息是否又问题
-	            System.out.println("\n" + content);
-	            //将数据端的信息转化为byte数组        
-	            byte[] sendData = (content + "\n").getBytes("utf-8");
-	            //填充发送包的信息        
-	            outPacket = new DatagramPacket(sendData , sendData.length , inPacket.getSocketAddress());
-	            //发射!!
-	            ds.send(outPacket);
-	            //执行成功
-	            System.out.println("send success\n");
-	            //将字符串置空
-	            content = null;
+	            //数据端连接成功后,准备发送到Android端
+	            ds = new DatagramSocket(PORT);
+	            //连接成功,打印
+	            System.out.println("conn success\n");
+	            //创建读端
+	            br1 = new BufferedReader(new InputStreamReader(s1.getInputStream(),"utf-8"));
 	
-	         }     
+	            
+		        while((content = readForm()) != null)
+		        {
+		        	//接收到的包,用于更改ip地址
+		        	try {
+		        		//2秒超时
+		        		ds.setSoTimeout(2000);
+		        	ds.receive(inPacket);
+		        	}
+		        	catch (Exception e){
+		        		e.printStackTrace();
+		        		break;
+		        	}
+		            
+		            //打印信息,用于检测接收信息是否又问题
+		            System.out.println("\n" + content);
+		            //将数据端的信息转化为byte数组        
+		            byte[] sendData = (content + "\n").getBytes("utf-8");
+		            //填充发送包的信息        
+		            outPacket = new DatagramPacket(sendData , sendData.length , inPacket.getSocketAddress());
+		            //发射!!
+		            ds.send(outPacket);
+		            //执行成功
+		            System.out.println("send success\n");
+		            //将字符串置空
+		            content = null;
+		
+		         }     
             
             
             
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally
-        {
-        	ds.close();
+	        } 
+	        catch (IOException e)
+	        {
+	            e.printStackTrace();
+	        }
+	        finally
+	        {
+	        	System.out.println("关闭接口\n");
+	        	ds.close();
+	        	
+	        }
         }
     }
 

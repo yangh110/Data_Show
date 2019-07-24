@@ -13,7 +13,8 @@ public class Main {
             //Server
             ServerSocket ser = new ServerSocket(12500);
             System.out.println("entry the programe\n");
-            while (true) {
+            while (true) 
+            {
             	
                 Socket s1 = ser.accept();
                 System.out.println("server socket link success\n");
