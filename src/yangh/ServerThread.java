@@ -100,15 +100,14 @@ public class ServerThread implements Runnable{
 	        } 
 	        catch (IOException e)
 	        {
-	            e.printStackTrace();
+	            //e.printStackTrace();
 	        }
-	        finally
-	        {
+	        
 	        	//关闭资源
 	        	System.out.println("close the socket\n");
 	        	ds.close();
 	        	ds_d.close();
-	        }
+	       
         }
     	//外层循环,死循环,人为的控制系统杀死进程
     }
