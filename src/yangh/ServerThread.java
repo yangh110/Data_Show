@@ -17,23 +17,23 @@ import java.util.Date;
 public class ServerThread implements Runnable{
 
     DatagramSocket ds = null;
+    DatagramSocket ds_d = null;
     private static final int PORT = 30000;
+    private static final int PORT_DATA = 12500;
     private static final int DATA_LEN = 4096;
     byte[] inBuff = new byte[DATA_LEN];
+    byte[] inBuff_data = new byte[DATA_LEN];
     //定义一个用于发送的packet对象
     private DatagramPacket inPacket = new DatagramPacket(inBuff , inBuff.length);
     private DatagramPacket outPacket;
+    //数据段传输接收对象
+    private DatagramPacket inPacket_data = new DatagramPacket(inBuff_data , inBuff.length);
+    private DatagramPacket outPacket_data;
     
     
-    
-    Socket s1 = null;
-    BufferedReader br = null;
-    BufferedReader br1 = null;
-    SimpleDateFormat df = null;
 
-    public ServerThread(Socket s1) throws IOException {
-        
-        this.s1 = s1;
+
+    public ServerThread() throws IOException {
        
        
     }
@@ -49,22 +49,36 @@ public class ServerThread implements Runnable{
 	            
 	            //数据端连接成功后,准备发送到Android端
 	            ds = new DatagramSocket(PORT);
-	            //连接成功,打印
-	            System.out.println("conn success\n");
 	            //创建读端
-	            br1 = new BufferedReader(new InputStreamReader(s1.getInputStream(),"utf-8"));
-	
+	            ds_d = new DatagramSocket(PORT_DATA);
 	            
-		        while((content = readForm()) != null)
+	            
+	            
+		        while(true)
 		        {
+		        	//先接收数据端的数据包
+		        	try {
+		        		ds_d.setSoTimeout(1000);
+		        		ds_d.receive(inPacket_data);
+		        	}
+		        	catch(SocketException se)
+		        	{
+		        		se.printStackTrace();
+		        		System.out.println("\nthe first socket\n");
+		        		break;
+		        	}
+		        	//数据提取并转为字符串
+		        	content = inPacket_data.getData().toString();
+		        	
 		        	//接收到的包,用于更改ip地址
 		        	try {
-		        		//2秒超时
-		        		ds.setSoTimeout(2000);
-		        	ds.receive(inPacket);
+		        		//超时
+		        		ds.setSoTimeout(1000);
+		        		ds.receive(inPacket);
 		        	}
-		        	catch (Exception e){
-		        		e.printStackTrace();
+		        	catch (SocketException se){
+		        		se.printStackTrace();
+		        		System.out.println("\nthe second socket\n");
 		        		break;
 		        	}
 		            
@@ -81,9 +95,7 @@ public class ServerThread implements Runnable{
 		            //将字符串置空
 		            content = null;
 		
-		         }     
-            
-            
+		         }         
             
 	        } 
 	        catch (IOException e)
@@ -92,24 +104,15 @@ public class ServerThread implements Runnable{
 	        }
 	        finally
 	        {
-	        	System.out.println("关闭接口\n");
+	        	//关闭资源
+	        	System.out.println("close the socket\n");
 	        	ds.close();
-	        	
+	        	ds_d.close();
 	        }
         }
+    	//外层循环,死循环,人为的控制系统杀死进程
     }
 
-    //读方法,是否读成功,长连接
-    private String readForm()
-    {
-        try {
-            return br1.readLine();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
+    
+    
 }

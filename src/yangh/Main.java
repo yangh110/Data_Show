@@ -11,14 +11,13 @@ public class Main {
 	// write your code here
 
             //Server
-            ServerSocket ser = new ServerSocket(12500);
             System.out.println("entry the programe\n");
             while (true) 
             {
             	
-                Socket s1 = ser.accept();
-                System.out.println("server socket link success\n");
-                new Thread(new ServerThread(s1)).start();
+                
+                //System.out.println("server socket link success\n");
+                new Thread(new ServerThread()).start();
             }
           
     }
