@@ -12,13 +12,12 @@ public class Main {
 
             //Server
             System.out.println("entry the programe\n");
-            while (true) 
-            {
+            
             	
                 
                 //System.out.println("server socket link success\n");
                 new Thread(new ServerThread()).start();
-            }
+            
           
     }
 }
