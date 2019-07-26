@@ -68,7 +68,7 @@ public class ServerThread implements Runnable{
 		        		break;
 		        	}
 		        	//数据提取并转为字符串
-		        	content = inPacket_data.getData().toString();
+		        	content = new String(inBuff_data , 0 , inPacket_data.getLength());
 		        	
 		        	//接收到的包,用于更改ip地址
 		        	try {
